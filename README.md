@@ -1,1 +1,9 @@
-# d3-react-stacked-area-chart
+# Building the Project
+
+### Dependencies
+* node v7+
+
+### Setup
+* npm install
+* npm run watch
+* npm run serve
