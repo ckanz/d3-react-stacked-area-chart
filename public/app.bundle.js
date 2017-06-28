@@ -26701,6 +26701,8 @@ var xAxis = d3.axisBottom(x);
 var xAxis2 = d3.axisBottom(x2);
 var yAxis = d3.axisLeft(y);
 
+var max = 400;
+
 function fetchData(rawData) {
   var flattenResult = dataTransformer.flattenData(rawData);
   var keys = flattenResult.keys;
@@ -26758,7 +26760,8 @@ var AreaChart = function (_Component) {
         return d.date;
       }));
       x2.domain(x.domain());
-      y2.domain(y.domain());
+      y.domain([0, max]);
+      y2.domain([0, max]);
 
       var svg = d3.select('#areaChart');
       var g = svg.append('g').attr('transform', 'translate(50,20)');
@@ -26823,25 +26826,30 @@ var AreaChart = function (_Component) {
 
       g.append('g').attr('class', 'axis axis--x').attr('transform', 'translate(0,' + (margin2.top + 50) + ')').call(xAxis2);
 
-      var brush = d3.brushX().extent([[0, 0], [width, height2]]).on('brush end', brushed);
+      var brush = d3.brushX().extent([[0, 0], [width, height2]]).on("brush end", brushed);
 
-      var zoom = d3.zoom().scaleExtent([1, 10]).translateExtent([[0, 0], [width, height]]).extent([[0, 0], [width, height]]).on('zoom', zoomed);
+      var zoom = d3.zoom().scaleExtent([1, 10]).translateExtent([[0, 0], [width, height]]).extent([[0, 0], [width, height]]).on("zoom", zoomed);
 
-      context.append('g').attr('class', 'brush').call(brush);
+      context.append('g').attr('class', 'brush').call(brush).call(brush.move, x.range());
 
-      function zoomed() {
-        var t = d3.event.transform;
-        focus.select('.area').attr('d', area);
-        g.select('.axis--x').call(xAxis);
-        context.select('.brush').call(brush.move, x.range().map(t.invertX, t));
-      }
+      svg.append("rect").attr("class", "zoom").attr("width", width).attr("height", height).attr("transform", "translate(" + margin.left + "," + margin.top + ")").call(zoom);
 
       function brushed() {
+        if (d3.event.sourceEvent && d3.event.sourceEvent.type === "zoom") return; // ignore brush-by-zoom
         var s = d3.event.selection || x2.range();
         x.domain(s.map(x2.invert, x2));
-        focus.select('.area').attr('d', area);
-        g.select('.axis--x').call(xAxis);
-        svg.select('.zoom').call(zoom.transform, d3.zoomIdentity.scale(width / (s[1] - s[0])).translate(-s[0], 0));
+        focus.select(".area").attr("d", area);
+        focus.select(".axis--x").call(xAxis);
+        svg.select(".zoom").call(zoom.transform, d3.zoomIdentity.scale(width / (s[1] - s[0])).translate(-s[0], 0));
+      }
+
+      function zoomed() {
+        if (d3.event.sourceEvent && d3.event.sourceEvent.type === "brush") return; // ignore zoom-by-brush
+        var t = d3.event.transform;
+        x.domain(t.rescaleX(x2).domain());
+        focus.select(".area").attr("d", area);
+        focus.select(".axis--x").call(xAxis);
+        context.select(".brush").call(brush.move, x.range().map(t.invertX, t));
       }
 
       var brushRange = x.range()[1];
