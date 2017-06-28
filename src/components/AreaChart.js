@@ -37,7 +37,7 @@ const xAxis = d3.axisBottom(x);
 const xAxis2 = d3.axisBottom(x2);
 const yAxis = d3.axisLeft(y);
 
-let max = 400;
+let max = 20;
 
 function fetchData(rawData) {
   const flattenResult = dataTransformer.flattenData(rawData);
@@ -99,6 +99,18 @@ class AreaChart extends Component {
 
     let svg = d3.select('#areaChart');
     let g = svg.append('g').attr('transform', 'translate(50,20)');
+
+    let brush = d3.brushX()
+      .extent([[0, 0], [width, height2]])
+      .on("brush end", brushed);
+
+    let zoom = d3.zoom()
+      .scaleExtent([1, 10])
+      .translateExtent([[0, 0], [width, height]])
+      .extent([[0, 0], [width, height]])
+      .on("zoom", zoomed);
+
+      svg.call(zoom);
 
     let focus = g.selectAll('.focus')
       .data(stack(data))
@@ -196,27 +208,17 @@ class AreaChart extends Component {
       .attr('transform', 'translate(0,' + (margin2.top+50) + ')')
       .call(xAxis2);
 
-    let brush = d3.brushX()
-      .extent([[0, 0], [width, height2]])
-      .on("brush end", brushed);
-
-    let zoom = d3.zoom()
-      .scaleExtent([1, 10])
-      .translateExtent([[0, 0], [width, height]])
-      .extent([[0, 0], [width, height]])
-      .on("zoom", zoomed);
-
     context.append('g')
       .attr('class', 'brush')
       .call(brush)
       .call(brush.move, x.range());
 
-    svg.append("rect")
-      .attr("class", "zoom")
-      .attr("width", width)
-      .attr("height", height)
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-      .call(zoom);
+    // svg.append("rect")
+    //   .attr("class", "zoom")
+    //   .attr("width", width)
+    //   .attr("height", height)
+    //   .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+    //   .call(zoom);
 
     function brushed() {
       if (d3.event.sourceEvent && d3.event.sourceEvent.type === "zoom") return; // ignore brush-by-zoom
