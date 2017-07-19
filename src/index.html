@@ -4,11 +4,30 @@
     <meta charset="utf-8">
     <title>TimeSeries Area Chart</title>
     <style>
-      html, body { margin: 0; padding: 0;}
-      .zoom {
+      html, body {
+        margin: 0;
+        padding: 0;
+        background-color: #282828;
+        color: #FFFFFF;
+      }
+      .axis line{
+        stroke: #FFFFFF;
+        z-index: 100;
+      }
+      .axis path{
+        stroke: #FFFFFF;
+        z-index: 100;
+      }
+      .axis text{
+        fill: #FFFFFF;
+        text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+        z-index: 100;
+      }
+      .focus {
         cursor: move;
-        fill: none;
-        pointer-events: all;
+      }
+      a {
+        color: #CCCCCC;
       }
     </style>
   </head>

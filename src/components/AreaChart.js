@@ -6,7 +6,7 @@ import Tooltip from './Tooltip';
 import HoverLine from './HoverLine';
 import * as dataTransformer from './../utilities/DataTransformer.js';
 
-const totalWidth = 1000;
+const totalWidth = screen.width-50;
 const totalHeight = 500;
 const chartStyles = {
   position: 'absolute',
@@ -27,7 +27,7 @@ const width = totalWidth - margin.left - margin.right;
 const height = totalHeight - margin.top - margin.bottom;
 const height2 = totalHeight - margin2.top - margin2.bottom;
 
-let max = 2000;
+let max = 1600;
 
 function fetchData(rawData) {
   const flattenResult = dataTransformer.flattenData(rawData);
@@ -90,7 +90,7 @@ class AreaChart extends Component {
     let stack = d3.stack();
     stack.keys(keys);
 
-    let g = svg.append('g').attr('transform', 'translate(50,20)');
+    let g = svg.append('g').attr('transform', 'translate(80,20)');
 
     let brush = d3.brushX()
       .extent([[0, 0], [width, height2]])
@@ -137,13 +137,15 @@ class AreaChart extends Component {
     let focus = g.selectAll('.focus')
       .data(stack(data))
       .enter().append('g')
-      .attr('class', 'focus');
+      .attr('class', 'focus')
+      //.call(zoom);
 
     focus.append('path')
       .attr('class', 'area')
       .style('fill', function(d) {
         return z(d.key);
       })
+      .style('opacity','0.8')
       .attr('d', area)
       .attr('id', function(d) {
         return d.key;
@@ -167,13 +169,11 @@ class AreaChart extends Component {
       })
       .on('mouseover', function(d) {
         d3.select(this)
-          .style('stroke','#646464')
-          .style('stroke-width','1px');
+          .style('opacity','1');
       })
       .on('mouseout', function(d) {
         d3.select(this)
-          .style('stroke','#646464')
-          .style('stroke-width','0px');
+          .style('opacity','0.8');
           _this.setState({
             globalTooltipData: {},
             mousePosition: {}
