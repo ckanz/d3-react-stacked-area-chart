@@ -21,7 +21,7 @@ function getDateString(dateObject) {
 function getDataString(metric, value) {
   let dataString = '';
   if(metric && value) {
-    dataString = metric + ': ' + getPercentageString(value);
+    dataString = metric + ': ' + value;
   }
   return dataString;
 }
