@@ -26691,16 +26691,6 @@ var width = totalWidth - margin.left - margin.right;
 var height = totalHeight - margin.top - margin.bottom;
 var height2 = totalHeight - margin2.top - margin2.bottom;
 
-var x = d3.scaleTime().range([0, width]);
-var x2 = d3.scaleTime().range([0, width]);
-var y = d3.scaleLinear().range([height, 0]);
-var y2 = d3.scaleLinear().range([height2, 0]);
-var z = d3.scaleOrdinal(d3.schemeCategory20);
-
-var xAxis = d3.axisBottom(x);
-var xAxis2 = d3.axisBottom(x2);
-var yAxis = d3.axisLeft(y);
-
 var max = 20;
 
 function fetchData(rawData) {
@@ -26752,27 +26742,26 @@ var AreaChart = function (_Component) {
       var keys = fetchedDataObj.keys;
       var _this = this;
 
+      var svg = d3.select('#areaChart');
+
+      var x = d3.scaleTime().range([0, width]);
+      var x2 = d3.scaleTime().range([0, width]);
+      var y = d3.scaleLinear().range([height, 0]);
+      var y2 = d3.scaleLinear().range([height2, 0]);
+      var z = d3.scaleOrdinal(d3.schemeCategory20);
+
+      var xAxis = d3.axisBottom(x);
+      var xAxis2 = d3.axisBottom(x2);
+      var yAxis = d3.axisLeft(y);
+
       var stack = d3.stack();
       stack.keys(keys);
-      z.domain(keys);
 
-      x.domain(d3.extent(data, function (d) {
-        return d.date;
-      }));
-      x2.domain(x.domain());
-      y.domain([0, max]);
-      y2.domain([0, max]);
-
-      var svg = d3.select('#areaChart');
       var g = svg.append('g').attr('transform', 'translate(50,20)');
 
       var brush = d3.brushX().extent([[0, 0], [width, height2]]).on("brush end", brushed);
 
-      var zoom = d3.zoom().scaleExtent([1, 10]).translateExtent([[0, 0], [width, height]]).extent([[0, 0], [width, height]]).on("zoom", zoomed);
-
-      svg.call(zoom);
-
-      var focus = g.selectAll('.focus').data(stack(data)).enter().append('g').attr('class', 'focus');
+      var zoom = d3.zoom().scaleExtent([1, Infinity]).translateExtent([[0, 0], [width, height]]).extent([[0, 0], [width, height]]).on("zoom", zoomed);
 
       var area = d3.area().curve(d3.curveBasis).x(function (d) {
         return x(d.data.date);
@@ -26790,9 +26779,16 @@ var AreaChart = function (_Component) {
         return y2(d[1]);
       });
 
-      g.append('g').attr('class', 'axis axis--x').attr('transform', 'translate(0,' + height + ')').call(xAxis);
+      z.domain(keys);
 
-      g.append('g').attr('class', 'axis axis--y').call(d3.axisLeft(y).ticks(10));
+      x.domain(d3.extent(data, function (d) {
+        return d.date;
+      }));
+      x2.domain(x.domain());
+      y.domain([0, max]);
+      y2.domain([0, max]);
+
+      var focus = g.selectAll('.focus').data(stack(data)).enter().append('g').attr('class', 'focus');
 
       focus.append('path').attr('class', 'area').style('fill', function (d) {
         return z(d.key);
@@ -26824,6 +26820,10 @@ var AreaChart = function (_Component) {
         });
       });
 
+      g.append("g").attr("class", "axis axis--x").attr("transform", "translate(0," + height + ")").call(xAxis);
+
+      g.append("g").attr("class", "axis axis--y").call(yAxis);
+
       var context = g.selectAll('.context').data(stack(data)).enter().append('g').attr('class', 'context').attr('transform', 'translate(' + 0 + ',' + margin2.top + ')');
 
       context.append('path').attr('class', 'area2').style('fill', function (d) {
@@ -26834,19 +26834,14 @@ var AreaChart = function (_Component) {
 
       context.append('g').attr('class', 'brush').call(brush).call(brush.move, x.range());
 
-      // svg.append("rect")
-      //   .attr("class", "zoom")
-      //   .attr("width", width)
-      //   .attr("height", height)
-      //   .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-      //   .call(zoom);
+      svg.call(zoom);
 
       function brushed() {
         if (d3.event.sourceEvent && d3.event.sourceEvent.type === "zoom") return; // ignore brush-by-zoom
         var s = d3.event.selection || x2.range();
         x.domain(s.map(x2.invert, x2));
         focus.select(".area").attr("d", area);
-        focus.select(".axis--x").call(xAxis);
+        g.select(".axis--x").call(xAxis);
         svg.select(".zoom").call(zoom.transform, d3.zoomIdentity.scale(width / (s[1] - s[0])).translate(-s[0], 0));
       }
 
@@ -26855,12 +26850,12 @@ var AreaChart = function (_Component) {
         var t = d3.event.transform;
         x.domain(t.rescaleX(x2).domain());
         focus.select(".area").attr("d", area);
-        focus.select(".axis--x").call(xAxis);
+        g.select(".axis--x").call(xAxis);
         context.select(".brush").call(brush.move, x.range().map(t.invertX, t));
       }
 
-      var brushRange = x.range()[1];
-      context.select('.brush').call(brush.move, [brushRange - 150, brushRange]);
+      // let brushRange = x.range()[1];
+      // context.select('.brush').call(brush.move, [brushRange-150,brushRange]);
     }
   }, {
     key: 'render',
@@ -27024,7 +27019,7 @@ function getDateString(dateObject) {
 function getDataString(metric, value) {
   var dataString = '';
   if (metric && value) {
-    dataString = metric + ': ' + getPercentageString(value);
+    dataString = metric + ': ' + value;
   }
   return dataString;
 }

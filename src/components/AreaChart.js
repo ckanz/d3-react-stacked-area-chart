@@ -27,16 +27,6 @@ const width = totalWidth - margin.left - margin.right;
 const height = totalHeight - margin.top - margin.bottom;
 const height2 = totalHeight - margin2.top - margin2.bottom;
 
-const x = d3.scaleTime().range([0, width]);
-const x2 = d3.scaleTime().range([0, width]);
-const y = d3.scaleLinear().range([height, 0]);
-const y2 = d3.scaleLinear().range([height2, 0]);
-const z = d3.scaleOrdinal(d3.schemeCategory20);
-
-const xAxis = d3.axisBottom(x);
-const xAxis2 = d3.axisBottom(x2);
-const yAxis = d3.axisLeft(y);
-
 let max = 20;
 
 function fetchData(rawData) {
@@ -86,18 +76,21 @@ class AreaChart extends Component {
     const keys = fetchedDataObj.keys;
     const _this = this;
 
+    let svg = d3.select('#areaChart');
+
+    let x = d3.scaleTime().range([0, width]);
+    let x2 = d3.scaleTime().range([0, width]);
+    let y = d3.scaleLinear().range([height, 0]);
+    let y2 = d3.scaleLinear().range([height2, 0]);
+    let z = d3.scaleOrdinal(d3.schemeCategory20);
+
+    let xAxis = d3.axisBottom(x);
+    let xAxis2 = d3.axisBottom(x2);
+    let yAxis = d3.axisLeft(y);
+
     let stack = d3.stack();
     stack.keys(keys);
-    z.domain(keys);
 
-    x.domain(d3.extent(data, function(d) {
-      return d.date;
-    }));
-    x2.domain(x.domain());
-    y.domain([0,max]);
-    y2.domain([0,max]);
-
-    let svg = d3.select('#areaChart');
     let g = svg.append('g').attr('transform', 'translate(50,20)');
 
     let brush = d3.brushX()
@@ -105,17 +98,10 @@ class AreaChart extends Component {
       .on("brush end", brushed);
 
     let zoom = d3.zoom()
-      .scaleExtent([1, 10])
+      .scaleExtent([1, Infinity])
       .translateExtent([[0, 0], [width, height]])
       .extent([[0, 0], [width, height]])
       .on("zoom", zoomed);
-
-      svg.call(zoom);
-
-    let focus = g.selectAll('.focus')
-      .data(stack(data))
-      .enter().append('g')
-      .attr('class', 'focus');
 
     let area = d3.area()
       .curve(d3.curveBasis)
@@ -140,14 +126,19 @@ class AreaChart extends Component {
         return y2(d[1]);
       });
 
-    g.append('g')
-      .attr('class', 'axis axis--x')
-      .attr('transform', 'translate(0,' + height + ')')
-      .call(xAxis);
+    z.domain(keys);
 
-    g.append('g')
-      .attr('class', 'axis axis--y')
-      .call(d3.axisLeft(y).ticks(10));
+    x.domain(d3.extent(data, function(d) {
+      return d.date;
+    }));
+    x2.domain(x.domain());
+    y.domain([0,max]);
+    y2.domain([0,max]);
+
+    let focus = g.selectAll('.focus')
+      .data(stack(data))
+      .enter().append('g')
+      .attr('class', 'focus');
 
     focus.append('path')
       .attr('class', 'area')
@@ -190,6 +181,15 @@ class AreaChart extends Component {
           });
       });
 
+     g.append("g")
+      .attr("class", "axis axis--x")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+
+    g.append("g")
+      .attr("class", "axis axis--y")
+      .call(yAxis);
+
     let context = g.selectAll('.context')
       .data(stack(data))
       .enter().append('g')
@@ -213,19 +213,14 @@ class AreaChart extends Component {
       .call(brush)
       .call(brush.move, x.range());
 
-    // svg.append("rect")
-    //   .attr("class", "zoom")
-    //   .attr("width", width)
-    //   .attr("height", height)
-    //   .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-    //   .call(zoom);
+    svg.call(zoom);
 
     function brushed() {
       if (d3.event.sourceEvent && d3.event.sourceEvent.type === "zoom") return; // ignore brush-by-zoom
       var s = d3.event.selection || x2.range();
       x.domain(s.map(x2.invert, x2));
       focus.select(".area").attr("d", area);
-      focus.select(".axis--x").call(xAxis);
+      g.select(".axis--x").call(xAxis);
       svg.select(".zoom").call(zoom.transform, d3.zoomIdentity
           .scale(width / (s[1] - s[0]))
           .translate(-s[0], 0));
@@ -236,12 +231,12 @@ class AreaChart extends Component {
       var t = d3.event.transform;
       x.domain(t.rescaleX(x2).domain());
       focus.select(".area").attr("d", area);
-      focus.select(".axis--x").call(xAxis);
+      g.select(".axis--x").call(xAxis);
       context.select(".brush").call(brush.move, x.range().map(t.invertX, t));
     }
 
-    let brushRange = x.range()[1];
-    context.select('.brush').call(brush.move, [brushRange-150,brushRange]);
+    // let brushRange = x.range()[1];
+    // context.select('.brush').call(brush.move, [brushRange-150,brushRange]);
   }
 
   render() {
