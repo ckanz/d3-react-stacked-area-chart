@@ -26691,7 +26691,7 @@ var width = totalWidth - margin.left - margin.right;
 var height = totalHeight - margin.top - margin.bottom;
 var height2 = totalHeight - margin2.top - margin2.bottom;
 
-var max = 20;
+var max = 2000;
 
 function fetchData(rawData) {
   var flattenResult = dataTransformer.flattenData(rawData);
@@ -26741,7 +26741,6 @@ var AreaChart = function (_Component) {
       var data = fetchedDataObj.data;
       var keys = fetchedDataObj.keys;
       var _this = this;
-
       var svg = d3.select('#areaChart');
 
       var x = d3.scaleTime().range([0, width]);
@@ -26759,9 +26758,9 @@ var AreaChart = function (_Component) {
 
       var g = svg.append('g').attr('transform', 'translate(50,20)');
 
-      var brush = d3.brushX().extent([[0, 0], [width, height2]]).on("brush end", brushed);
+      var brush = d3.brushX().extent([[0, 0], [width, height2]]).on('brush end', brushed);
 
-      var zoom = d3.zoom().scaleExtent([1, Infinity]).translateExtent([[0, 0], [width, height]]).extent([[0, 0], [width, height]]).on("zoom", zoomed);
+      var zoom = d3.zoom().scaleExtent([1, Infinity]).translateExtent([[0, 0], [width, height]]).extent([[0, 0], [width, height]]).on('zoom', zoomed);
 
       var area = d3.area().curve(d3.curveBasis).x(function (d) {
         return x(d.data.date);
@@ -26820,9 +26819,9 @@ var AreaChart = function (_Component) {
         });
       });
 
-      g.append("g").attr("class", "axis axis--x").attr("transform", "translate(0," + height + ")").call(xAxis);
+      g.append('g').attr('class', 'axis axis--x').attr('transform', 'translate(0,' + height + ')').call(xAxis);
 
-      g.append("g").attr("class", "axis axis--y").call(yAxis);
+      g.append('g').attr('class', 'axis axis--y').call(yAxis);
 
       var context = g.selectAll('.context').data(stack(data)).enter().append('g').attr('class', 'context').attr('transform', 'translate(' + 0 + ',' + margin2.top + ')');
 
@@ -26837,25 +26836,22 @@ var AreaChart = function (_Component) {
       svg.call(zoom);
 
       function brushed() {
-        if (d3.event.sourceEvent && d3.event.sourceEvent.type === "zoom") return; // ignore brush-by-zoom
+        if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'zoom') return; // ignore brush-by-zoom
         var s = d3.event.selection || x2.range();
         x.domain(s.map(x2.invert, x2));
-        focus.select(".area").attr("d", area);
-        g.select(".axis--x").call(xAxis);
-        g.select(".brush").call(zoom.transform, d3.zoomIdentity.scale(width / (s[1] - s[0])).translate(-s[0], 0));
+        focus.select('.area').attr('d', area);
+        g.select('.axis--x').call(xAxis);
+        g.select('.brush').call(zoom.transform, d3.zoomIdentity.scale(width / (s[1] - s[0])).translate(-s[0], 0));
       }
 
       function zoomed() {
-        if (d3.event.sourceEvent && d3.event.sourceEvent.type === "brush") return; // ignore zoom-by-brush
+        if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'brush') return; // ignore zoom-by-brush
         var t = d3.event.transform;
         x.domain(t.rescaleX(x2).domain());
-        focus.select(".area").attr("d", area);
-        g.select(".axis--x").call(xAxis);
-        g.select(".brush").call(brush.move, x.range().map(t.invertX, t));
+        focus.select('.area').attr('d', area);
+        g.select('.axis--x').call(xAxis);
+        g.select('.brush').call(brush.move, x.range().map(t.invertX, t));
       }
-
-      // let brushRange = x.range()[1];
-      // context.select('.brush').call(brush.move, [brushRange-150,brushRange]);
     }
   }, {
     key: 'render',
@@ -27123,7 +27119,7 @@ function flattenData(data) {
       var thisDate = row.date;
       row.date = parseDate(row.date);
       var metricName = row.name;
-      row[metricName] = +row.count / 100;
+      row[metricName] = +row.count;
       delete row.name;
       delete row.count;
     });

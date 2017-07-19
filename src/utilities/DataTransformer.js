@@ -16,7 +16,7 @@ function flattenData(data) {
       let thisDate = row.date;
       row.date = parseDate(row.date);
       let metricName = row.name;
-      row[metricName] = (+row.count) / 100;
+      row[metricName] = (+row.count);
       delete row.name;
       delete row.count;
     });
