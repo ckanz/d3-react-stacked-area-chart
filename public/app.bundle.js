@@ -26832,7 +26832,7 @@ var AreaChart = function (_Component) {
 
       g.append('g').attr('class', 'axis axis--x').attr('transform', 'translate(0,' + (margin2.top + 50) + ')').call(xAxis2);
 
-      context.append('g').attr('class', 'brush').call(brush).call(brush.move, x.range());
+      g.append('g').attr('class', 'brush').call(brush).call(brush.move, x.range()).attr('transform', 'translate(' + 0 + ',' + margin2.top + ')');
 
       svg.call(zoom);
 
@@ -26842,7 +26842,7 @@ var AreaChart = function (_Component) {
         x.domain(s.map(x2.invert, x2));
         focus.select(".area").attr("d", area);
         g.select(".axis--x").call(xAxis);
-        svg.select(".zoom").call(zoom.transform, d3.zoomIdentity.scale(width / (s[1] - s[0])).translate(-s[0], 0));
+        g.select(".brush").call(zoom.transform, d3.zoomIdentity.scale(width / (s[1] - s[0])).translate(-s[0], 0));
       }
 
       function zoomed() {
@@ -26851,7 +26851,7 @@ var AreaChart = function (_Component) {
         x.domain(t.rescaleX(x2).domain());
         focus.select(".area").attr("d", area);
         g.select(".axis--x").call(xAxis);
-        context.select(".brush").call(brush.move, x.range().map(t.invertX, t));
+        g.select(".brush").call(brush.move, x.range().map(t.invertX, t));
       }
 
       // let brushRange = x.range()[1];
