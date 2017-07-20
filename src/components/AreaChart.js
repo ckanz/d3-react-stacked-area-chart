@@ -6,7 +6,7 @@ import Tooltip from './Tooltip';
 import HoverLine from './HoverLine';
 import * as dataTransformer from './../utilities/DataTransformer.js';
 
-const totalWidth = screen.width-50;
+const totalWidth = window.innerWidth-50;
 const totalHeight = 500;
 const chartStyles = {
   position: 'absolute',
@@ -134,11 +134,21 @@ class AreaChart extends Component {
     y.domain([0,max]);
     y2.domain([0,max]);
 
+    function make_y_gridlines() {
+      return d3.axisLeft(y).ticks(6);
+    }
+
+    g.append("g")
+      .attr("class", "grid")
+      .call(make_y_gridlines()
+          .tickSize(-width)
+          .tickFormat("")
+    );
+
     let focus = g.selectAll('.focus')
       .data(stack(data))
       .enter().append('g')
-      .attr('class', 'focus')
-      //.call(zoom);
+      .attr('class', 'focus');
 
     focus.append('path')
       .attr('class', 'area')

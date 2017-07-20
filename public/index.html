@@ -10,6 +10,9 @@
         background-color: #282828;
         color: #FFFFFF;
       }
+      a {
+        color: #CCCCCC;
+      }
       .axis line{
         stroke: #FFFFFF;
         z-index: 100;
@@ -26,8 +29,13 @@
       .focus {
         cursor: move;
       }
-      a {
-        color: #CCCCCC;
+      .grid line {
+        stroke: white;
+        stroke-opacity: 0.7;
+        shape-rendering: crispEdges;
+      }
+      .grid path {
+        stroke-width: 0;
       }
     </style>
   </head>
