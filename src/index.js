@@ -1,9 +1,9 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import AreaChart from "./components/AreaChart";
-import GradientBorder from "./components/GradientBorder";
-import Header from "./components/Header";
-import data from "./data";
+import React from 'react';
+import ReactDOM from 'react-dom';
+import AreaChart from './components/AreaChart';
+import GradientBorder from './components/GradientBorder';
+import Header from './components/Header';
+import data from './data';
 
 const chartAreaStyle = {
   marginTop: 20
@@ -28,4 +28,4 @@ const App = () => (
   </div>
 );
 
-ReactDOM.render(<App />, document.getElementById("app"));
+ReactDOM.render(<App />, document.getElementById('app'));
