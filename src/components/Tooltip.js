@@ -5,10 +5,6 @@ const style = {
   fontFamily: 'Sans-serif',
 };
 
-function getPercentageString(value) {
-  return String((value*100).toFixed(2) + '%');
-}
-
 function getDateString(dateObject) {
   let dateString = '';
   if(dateObject) {
@@ -18,10 +14,10 @@ function getDateString(dateObject) {
   return dateString;
 }
 
-function getDataString(metric, value) {
+function getDataString(metric, value, date) {
   let dataString = '';
-  if(metric && value) {
-    dataString = metric + ': ' + value;
+  if(metric && value && date) {
+    dataString = value + ' "' + metric + '" incidents reported on ' + date;
   }
   return dataString;
 }
@@ -33,8 +29,15 @@ class Tooltip extends React.Component {
     };
     return (
       <div id='tooltip' style={style}>
-        <p>{getDateString(this.props.tooltipData.date)}</p>
-        <p style={metricStyle}>{getDataString(this.props.tooltipData.metric, this.props.tooltipData.value)}</p>
+        <p style={metricStyle}>{
+          getDataString(
+            this.props.tooltipData.metric,
+            this.props.tooltipData.value,
+            getDateString(
+              this.props.tooltipData.date
+            )
+          )
+        }</p>
       </div>
     );
   }

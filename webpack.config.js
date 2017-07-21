@@ -1,16 +1,16 @@
-const path = require("path");
-const webpack = require("webpack");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
+const path = require('path');
+const webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  context: path.resolve(__dirname, "./src"),
+  context: path.resolve(__dirname, './src'),
   entry: {
-    app: "./index.js",
+    app: './index.js',
   },
   output: {
-    path: path.resolve(__dirname, "./public"),
-    filename: "[name].bundle.js",
-    publicPath: ".",
+    path: path.resolve(__dirname, './public'),
+    filename: '[name].bundle.js',
+    publicPath: '.',
   },
   module: {
     rules: [
@@ -19,7 +19,7 @@ module.exports = {
         exclude: [/node_modules/],
         use: [
           {
-            loader: "babel-loader",
+            loader: 'babel-loader',
             query: {
               presets: ['es2015', 'react']
             }
@@ -30,7 +30,7 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, "src/index.html"),
+      template: path.resolve(__dirname, 'src/index.html'),
     }),
   ],
 };
