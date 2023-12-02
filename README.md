@@ -6,6 +6,8 @@ This project is a stacked area chart built with d3v4 using the React framework i
 
 ![screenshot](https://github.com/ckanz/d3-react-stacked-area-chart/blob/master/screenshot.png?raw=true)
 
+It is hosted on [https://ckanz.github.io/d3-react-stacked-area-chart/public/](https://ckanz.github.io/d3-react-stacked-area-chart/public/).
+
 ### Dependencies
 * node v7+
 
